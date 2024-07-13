@@ -4,7 +4,8 @@
   "description": "A simple server to generate Agora tokens",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "dependencies": {
     "agora-access-token": "^2.0.0",
