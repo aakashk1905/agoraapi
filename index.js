@@ -7,7 +7,9 @@ const port = process.env.PORT || 3000;
 
 const AGORA_APP_ID = process.env.AGORA_APP_ID;
 const AGORA_APP_CERTIFICATE = process.env.AGORA_APP_CERTIFICATE;
-
+app.get("/", (req, res) => {
+  res.json({ Success: true });
+});
 app.get("/token", (req, res) => {
   const channelName = req.query.channel;
   const uid = req.query.uid || 0;
