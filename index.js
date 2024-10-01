@@ -11,7 +11,13 @@ app.get("/", (req, res) => {
   res.json({ Success: true });
 });
 app.get("/token", (req, res) => {
-  const { channel, uid, account, role = "publisher", expiration = 3600 } = req.query;
+  const {
+    channel,
+    uid,
+    account,
+    role = "publisher",
+    expiration = 3600,
+  } = req.query;
 
   // Validate required parameter
   if (!channel) {
@@ -20,7 +26,9 @@ app.get("/token", (req, res) => {
 
   // Validate that either uid or account is provided
   if (!uid && !account) {
-    return res.status(400).json({ error: "Either uid or account must be provided" });
+    return res
+      .status(400)
+      .json({ error: "Either uid or account must be provided" });
   }
 
   // Determine the role
@@ -30,7 +38,9 @@ app.get("/token", (req, res) => {
   } else if (role.toLowerCase() === "subscriber") {
     agoraRole = RtcRole.SUBSCRIBER;
   } else {
-    return res.status(400).json({ error: "Invalid role. Must be 'publisher' or 'subscriber'" });
+    return res
+      .status(400)
+      .json({ error: "Invalid role. Must be 'publisher' or 'subscriber'" });
   }
 
   // Calculate token expiration
@@ -71,7 +81,7 @@ app.get("/token", (req, res) => {
       }
     } else if (account) {
       // Generate token with User Account
-      token = RtcTokenBuilder.buildTokenWithUserAccount(
+      token = RtcTokenBuilder.buildTokenWithAccount(
         AGORA_APP_ID,
         AGORA_APP_CERTIFICATE,
         channel,
@@ -85,6 +95,25 @@ app.get("/token", (req, res) => {
   } catch (error) {
     console.error("Error generating token:", error);
     res.status(500).json({ error: "Failed to generate token" });
+  }
+});
+
+app.get("/chattoken", async (req, res) => {
+  const userName = req.query.user;
+  const projectId = "pxVdOCbZ9";
+  const apiUrl = `https://console.agora.io/api/v2/chat/token?projectId=${projectId}&type=user&userId=${userName}`;
+
+  try {
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+          const errorData = await response.json();
+          return res.status(response.status).json({ error: errorData.message || 'Failed to fetch token' });
+      }
+      const tokenData = await response.json();
+      res.json({ token: tokenData.token });
+  } catch (error) {
+      console.error("Error fetching Agora token:", error);
+      res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
